@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unhingedly — Digital tools for brains that don't do "just focus"</title>
+<meta name="description" content="Unhingedly makes planners, templates, and dopamine-friendly systems for ADHD brains. No shame spirals, no pastel guilt trips.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #FBF8ED;
+    --paper-alt: #F1EAD1;
+    --panel: #FFFFFF;
+    --ink: #1C1710;
+    --ink-soft: #726A5B;
+    --line: #E4DBBD;
+    --pink: #FF3B73;
+    --pink-deep: #D81C57;
+    --lime: #C6F24E;
+    --lime-deep: #8FBF1E;
+    --peri: #5D6BFF;
+    --peri-deep: #3B47D6;
+    --cork: #C9A66B;
+    --cork-dot: #B08E52;
+    --radius-card: 18px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-hand: 'Caveat', cursive;
+    --shadow-card: 0 10px 24px -12px rgba(28,23,16,0.28);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+  img{ max-width:100%; display:block; }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  h1,h2,h3{
+    font-family: var(--font-display);
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible{
+    outline: 3px solid var(--peri);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 13px 24px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn:active{ transform: translateY(0); }
+  .btn-primary{ background: var(--pink); color: #fff; border-color: var(--pink-deep); box-shadow: 3px 3px 0 var(--ink); }
+  .btn-primary:hover{ box-shadow: 5px 5px 0 var(--ink); }
+  .btn-dark{ background: var(--ink); color: var(--paper); box-shadow: 3px 3px 0 var(--peri); }
+  .btn-dark:hover{ box-shadow: 5px 5px 0 var(--peri); }
+  .btn-ghost{ background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn-ghost:hover{ background: var(--ink); color: var(--paper); }
+  .btn-sm{ padding: 9px 16px; font-size: 13px; }
+  .btn-block{ width: 100%; justify-content: center; }
+
+  .tag{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 12px 5px 10px;
+    border-radius: 999px;
+    background: var(--paper-alt);
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- Order banner ---------- */
+  .order-banner{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap: 14px;
+    padding: 12px 20px;
+    font-weight:600;
+    font-size: 14px;
+    text-align:center;
+  }
+  .order-banner.show{ display:flex; }
+  .order-banner.success{ background: var(--lime); color: var(--ink); }
+  .order-banner.cancel{ background: var(--paper-alt); color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+  .order-banner button{ background:none; border:none; font-weight:700; cursor:pointer; text-decoration:underline; color:inherit; padding:0; font-size:14px; }
+
+  /* ---------- Nav ---------- */
+  .nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(251,248,237,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .logo{
+    display:flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .logo-mark{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .logo-sub{
+    font-family: var(--font-hand);
+    font-size: 17px;
+    color: var(--pink-deep);
+    transform: rotate(-3deg);
+  }
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap: 30px;
+  }
+  .nav-links a{
+    text-decoration:none;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .nav-links a:hover{ color: var(--pink-deep); }
+  .nav-right{ display:flex; align-items:center; gap:16px; }
+  .icon-btn{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: var(--panel);
+    cursor:pointer;
+  }
+  .icon-btn svg{ width:18px; height:18px; stroke: var(--ink); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .cart-count{
+    position:absolute;
+    top:-6px; right:-6px;
+    background: var(--pink);
+    color:#fff;
+    font-size: 11px;
+    font-weight:700;
+    min-width: 18px; height:18px;
+    border-radius: 999px;
+    display:flex; align-items:center; justify-content:center;
+    padding: 0 3px;
+    border: 2px solid var(--paper);
+  }
+  .menu-toggle{ display:none; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: 64px 0 40px;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 48px;
+    align-items:center;
+  }
+  .eyebrow-hand{
+    font-family: var(--font-hand);
+    font-size: 21px;
+    color: var(--pink-deep);
+    margin-bottom: 6px;
+    display:inline-block;
+    transform: rotate(-2deg);
+  }
+  .hero h1{
+    font-size: 46px;
+    line-height: 1.08;
+    max-width: 620px;
+  }
+  .hero p.lead{
+    font-size: 17.5px;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 20px 0 28px;
+  }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  .hero-note{
+    margin-top: 22px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hero-note svg{ width:15px;height:15px; stroke: var(--lime-deep); fill:none; stroke-width:2; }
+
+  .cork{
+    position: relative;
+    background: var(--cork);
+    background-image: radial-gradient(var(--cork-dot) 1.4px, transparent 1.4px);
+    background-size: 16px 16px;
+    border-radius: 24px;
+    height: 460px;
+    box-shadow: inset 0 0 0 8px rgba(255,255,255,0.14), 0 14px 30px -14px rgba(28,23,16,0.4);
+  }
+  .pin{
+    position:absolute;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 16px;
+  }
+  .pin-01{
+    top: 30px; left: 32px; width: 170px;
+    background: var(--peri); color:#fff;
+    transform: rotate(-7deg);
+  }
+  .pin-02{
+    top: 18px; right: 26px; width: 178px;
+    background: var(--ink); color: var(--paper);
+    transform: rotate(5deg);
+  }
+  .pin-03{
+    bottom: 32px; left: 70px; width: 190px;
+    background: var(--lime); color: var(--ink);
+    transform: rotate(4deg);
+  }
+  .pin-note{
+    position:absolute;
+    bottom: 24px; right: 20px;
+    width: 150px;
+    background: #FFF3B0;
+    color: var(--ink);
+    font-family: var(--font-hand);
+    font-size: 19px;
+    line-height: 1.25;
+    padding: 14px 16px 18px;
+    transform: rotate(-4deg);
+    box-shadow: var(--shadow-card);
+    border-radius: 3px;
+  }
+  .pin-tape{
+    position:absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 70px; height: 26px;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,0.55), rgba(255,255,255,0.55) 6px, rgba(255,255,255,0.25) 6px, rgba(255,255,255,0.25) 12px), #EADFA6;
+    opacity: 0.9;
+    border-radius: 2px;
+  }
+  .pin-title{ font-family: var(--font-display); font-weight:700; font-size: 14px; margin-bottom: 4px; }
+  .pin-sub{ font-size: 12.5px; opacity: 0.85; }
+  .pin-icon{ width:20px; height:20px; margin-bottom:10px; }
+  .pin-icon svg{ width:100%; height:100%; stroke: currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+  @media (prefers-reduced-motion: no-preference){
+    .pin{ animation: settle 0.7s cubic-bezier(.2,.8,.3,1) both; }
+    .pin-01{ animation-delay: 0.05s; }
+    .pin-02{ animation-delay: 0.15s; }
+    .pin-03{ animation-delay: 0.25s; }
+    .pin-note{ animation: settle 0.7s cubic-bezier(.2,.8,.3,1) both; animation-delay: 0.35s; }
+  }
+  @keyframes settle{
+    from{ opacity:0; transform: translateY(16px) rotate(0deg) scale(0.94); }
+  }
+
+  /* ---------- Problem strip ---------- */
+  .problem{
+    padding: 70px 0 20px;
+    border-top: 1px solid var(--line);
+  }
+  .problem h2{
+    font-size: 30px;
+    max-width: 640px;
+    line-height: 1.2;
+  }
+  .problem .lead{ color: var(--ink-soft); margin-top:14px; max-width: 560px; font-size: 16px; }
+  .sticky-row{
+    display:flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 40px 4px 16px;
+    scrollbar-width: thin;
+  }
+  .sticky{
+    flex: 0 0 auto;
+    width: 172px;
+    min-height: 130px;
+    padding: 16px;
+    font-family: var(--font-hand);
+    font-size: 19px;
+    line-height: 1.3;
+    box-shadow: var(--shadow-card);
+    border-radius: 3px;
+  }
+  .sticky:nth-child(1){ background: #FFD9E5; transform: rotate(-4deg); }
+  .sticky:nth-child(2){ background: var(--lime); transform: rotate(3deg); }
+  .sticky:nth-child(3){ background: #C9D4FF; transform: rotate(-2deg); }
+  .sticky:nth-child(4){ background: #FFF3B0; transform: rotate(5deg); }
+  .sticky:nth-child(5){ background: #FFD9B0; transform: rotate(-3deg); }
+
+  /* ---------- Shop ---------- */
+  .shop{ padding: 70px 0; border-top: 1px solid var(--line); }
+  .section-head{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .section-head h2{ font-size: 30px; }
+  .filters{ display:flex; gap:8px; flex-wrap:wrap; }
+  .filter-btn{
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--panel);
+    color: var(--ink-soft);
+    cursor:pointer;
+  }
+  .filter-btn.active{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .shop-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .product{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .product:hover{ transform: translateY(-4px); box-shadow: var(--shadow-card); }
+  .cover{
+    height: 168px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding: 16px;
+    color:#fff;
+  }
+  .cover .pin-tape{ top:-1px; left: 22px; transform: rotate(-8deg); opacity:0.8; }
+  .cover-icon{ width:26px; height:26px; margin-bottom: auto; }
+  .cover-icon svg{ width:100%; height:100%; stroke:#fff; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .cover-title{ font-family: var(--font-display); font-weight:700; font-size: 18px; line-height:1.15; }
+  .c1{ background: var(--peri); }
+  .c2{ background: var(--pink); }
+  .c3{ background: #2E2A22; }
+  .c4{ background: var(--lime-deep); }
+  .c5{ background: #E38A2E; }
+  .c6{ background: var(--ink); }
+
+  .product-body{ padding: 18px 18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; }
+  .product-top{ display:flex; justify-content: space-between; align-items:flex-start; gap: 10px; }
+  .product-name{ font-family: var(--font-display); font-weight:700; font-size: 16.5px; line-height:1.25; }
+  .product-price{ font-weight:700; font-size: 16.5px; white-space:nowrap; }
+  .product-desc{ font-size: 14px; color: var(--ink-soft); flex:1; }
+  .product-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:4px; }
+
+  /* ---------- How it works ---------- */
+  .how{ padding: 70px 0; border-top: 1px solid var(--line); }
+  .how-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 34px;
+  }
+  .how-step{ display:flex; flex-direction:column; gap: 10px; }
+  .how-num{
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight:700;
+    width: 34px; height:34px;
+    border-radius:50%;
+    border: 2px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .how-step h3{ font-size: 18px; margin-top:6px; }
+  .how-step p{ color: var(--ink-soft); font-size: 14.5px; margin:0; }
+
+  /* ---------- Testimonials ---------- */
+  .reviews{ padding: 70px 0; border-top: 1px solid var(--line); }
+  .reviews-grid{
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 22px;
+    margin-top: 30px;
+  }
+  .review{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: 22px;
+  }
+  .review p{ font-size: 15.5px; margin: 0 0 16px; }
+  .review-who{ display:flex; align-items:center; gap:10px; }
+  .avatar{
+    width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-display); font-weight:700; font-size:13px; color:#fff;
+  }
+  .review-name{ font-weight:600; font-size:13.5px; }
+  .review-role{ font-size:12px; color: var(--ink-soft); }
+
+  /* ---------- Bundle ---------- */
+  .bundle{ padding: 30px 0 70px; }
+  .bundle-panel{
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 24px;
+    padding: 48px;
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 40px;
+    align-items:center;
+    position: relative;
+    overflow:hidden;
+  }
+  .bundle-panel::before{
+    content:"";
+    position:absolute;
+    width: 320px; height: 320px;
+    background: var(--lime);
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    top: -120px; right: -80px;
+  }
+  .bundle-panel h2{ font-size: 28px; max-width: 420px; color: var(--paper); }
+  .bundle-panel p{ color: #C9C2AE; margin: 16px 0 24px; max-width: 440px; font-size: 15px; }
+  .bundle-price-box{
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 18px;
+    padding: 26px;
+    text-align:center;
+  }
+  .bundle-old{ text-decoration: line-through; color: #9A927D; font-size: 15px; }
+  .bundle-new{ font-family: var(--font-display); font-size: 42px; font-weight:700; margin: 4px 0 2px; color: var(--lime); }
+  .bundle-save{ font-size: 13px; color: #C9C2AE; margin-bottom: 18px; }
+
+  /* ---------- FAQ ---------- */
+  .faq{ padding: 70px 0; border-top: 1px solid var(--line); }
+  .faq-list{ max-width: 760px; margin-top: 30px; }
+  .faq-item{
+    border-bottom: 1px solid var(--line);
+  }
+  .faq-item summary{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 20px 4px;
+    font-weight:600;
+    font-size: 16px;
+  }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary .plus{
+    width: 22px; height:22px;
+    flex: 0 0 auto;
+    position:relative;
+  }
+  .faq-item summary .plus::before, .faq-item summary .plus::after{
+    content:"";
+    position:absolute;
+    background: var(--ink);
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+  }
+  .faq-item summary .plus::before{ width:14px; height:2px; }
+  .faq-item summary .plus::after{ width:2px; height:14px; transition: transform 0.15s ease; }
+  .faq-item[open] summary .plus::after{ transform: translate(-50%,-50%) rotate(90deg) scale(0); }
+  .faq-item p{ margin: 0 0 20px; color: var(--ink-soft); font-size: 14.5px; max-width: 620px; }
+
+  /* ---------- Newsletter ---------- */
+  .news{ padding: 20px 0 80px; }
+  .news-panel{
+    background: var(--paper-alt);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 46px;
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap: 30px;
+    align-items:center;
+  }
+  .news-panel h2{ font-size: 24px; }
+  .news-panel p{ color: var(--ink-soft); margin: 10px 0 0; font-size: 14.5px; max-width: 420px; }
+  .news-form{ display:flex; gap:10px; }
+  .news-form input{
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    padding: 13px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--ink);
+    width: 240px;
+    background: var(--panel);
+  }
+  .news-confirm{ font-family: var(--font-hand); font-size: 19px; color: var(--pink-deep); }
+
+  /* ---------- Footer ---------- */
+  footer{ border-top: 1px solid var(--line); padding: 44px 0 30px; }
+  .foot-grid{ display:flex; justify-content: space-between; gap: 30px; flex-wrap:wrap; }
+  .foot-brand{ max-width: 320px; }
+  .foot-brand p{ color: var(--ink-soft); font-size: 13.5px; margin-top: 10px; }
+  .foot-cols{ display:flex; gap: 60px; flex-wrap:wrap; }
+  .foot-col h4{ font-size: 13px; margin: 0 0 12px; }
+  .foot-col a{ display:block; text-decoration:none; color: var(--ink-soft); font-size: 13.5px; margin-bottom: 9px; }
+  .foot-col a:hover{ color: var(--pink-deep); }
+  .foot-bottom{ margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size: 12.5px; color: var(--ink-soft); }
+
+  /* ---------- Cart drawer ---------- */
+  .cart-overlay{
+    position:fixed; inset:0; background: rgba(28,23,16,0.35);
+    opacity:0; pointer-events:none; transition: opacity 0.2s ease; z-index: 90;
+  }
+  .cart-overlay.open{ opacity:1; pointer-events:auto; }
+  .cart-drawer{
+    position:fixed; top:0; right:0; height:100%; width: 380px; max-width: 90vw;
+    background: var(--paper); z-index: 91; box-shadow: -10px 0 30px rgba(0,0,0,0.15);
+    transform: translateX(100%); transition: transform 0.25s ease;
+    display:flex; flex-direction:column;
+  }
+  .cart-drawer.open{ transform: translateX(0); }
+  .cart-head{ display:flex; justify-content:space-between; align-items:center; padding: 22px 24px; border-bottom: 1px solid var(--line); }
+  .cart-head h3{ font-size: 19px; }
+  .cart-items{ flex:1; overflow-y:auto; padding: 8px 24px; }
+  .cart-item{ display:flex; gap:12px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items:flex-start; }
+  .cart-item-swatch{ width:44px; height:44px; border-radius:10px; flex:0 0 auto; }
+  .cart-item-name{ font-weight:600; font-size: 14px; }
+  .cart-item-price{ font-size: 13px; color: var(--ink-soft); margin-top:2px; }
+  .cart-item-remove{ background:none; border:none; color: var(--ink-soft); font-size:12.5px; cursor:pointer; text-decoration:underline; padding:0; margin-top:6px; }
+  .cart-empty{ color: var(--ink-soft); font-size: 14px; padding: 30px 0; text-align:center; }
+  .cart-foot{ padding: 20px 24px 26px; border-top: 1px solid var(--line); }
+  .cart-total{ display:flex; justify-content:space-between; font-weight:700; font-size: 16px; margin-bottom: 16px; }
+  .cart-toast{ font-family: var(--font-hand); font-size: 17px; color: var(--pink-deep); margin-top: 12px; text-align:center; min-height: 20px; }
+
+  /* ---------- Mobile menu ---------- */
+  .mobile-menu{
+    position: fixed; inset:0; background: var(--paper); z-index: 80;
+    display:flex; flex-direction:column; padding: 24px 28px;
+    transform: translateY(-100%); transition: transform 0.25s ease;
+  }
+  .mobile-menu.open{ transform: translateY(0); }
+  .mobile-menu-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 40px; }
+  .mobile-menu a{ font-family: var(--font-display); font-size: 26px; font-weight:700; text-decoration:none; color:var(--ink); padding: 14px 0; border-bottom: 1px solid var(--line); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px){
+    .hero-grid{ grid-template-columns: 1fr; }
+    .cork{ height: 340px; order: -1; }
+    .hero h1{ font-size: 36px; }
+    .shop-grid{ grid-template-columns: repeat(2,1fr); }
+    .how-grid{ grid-template-columns: 1fr; gap: 30px; }
+    .reviews-grid{ grid-template-columns: 1fr; }
+    .bundle-panel{ grid-template-columns: 1fr; padding: 34px; }
+    .news-panel{ grid-template-columns: 1fr; text-align:left; }
+    .news-form{ flex-wrap:wrap; }
+    .news-form input{ width: 100%; }
+    .nav-links{ display:none; }
+    .menu-toggle{ display:flex; }
+  }
+  @media (max-width: 620px){
+    .shop-grid{ grid-template-columns: 1fr; }
+    .wrap{ padding: 0 20px; }
+    .bundle-panel{ padding: 26px; }
+    .foot-grid{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="order-banner" id="orderBanner">
+  <span id="orderBannerText"></span>
+  <button id="orderBannerClose" aria-label="Dismiss">Dismiss</button>
+</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark">Unhingedly</span>
+      <span class="logo-sub">(affectionately)</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#shop">Shop</a>
+      <a href="#how">How it works</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="cartOpenBtn" aria-label="Open cart">
+        <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+      <button class="icon-btn menu-toggle" id="menuOpenBtn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-head">
+    <span class="logo-mark">Unhingedly</span>
+    <button class="icon-btn" id="menuCloseBtn" aria-label="Close menu">
+      <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg>
+    </button>
+  </div>
+  <a href="#shop">Shop</a>
+  <a href="#how">How it works</a>
+  <a href="#reviews">Reviews</a>
+  <a href="#faq">FAQ</a>
+</div>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow-hand">built by a brain like yours</span>
+        <h1>Your brain isn't broken. Your planner just wasn't built for it.</h1>
+        <p class="lead">Unhingedly makes digital planners, templates, and dopamine-friendly systems for ADHD brains — the ones that need structure without a shame spiral attached.</p>
+        <div class="hero-ctas">
+          <a href="#shop" class="btn btn-primary">Browse the shop</a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+        <div class="hero-note">
+          <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+          Instant download. No app to forget you installed.
+        </div>
+      </div>
+
+      <div class="cork" aria-hidden="true">
+        <div class="pin pin-01">
+          <div class="pin-tape"></div>
+          <div class="pin-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/></svg></div>
+          <div class="pin-title">Dopamine Menu Deck</div>
+          <div class="pin-sub">80 tasks, sorted by energy</div>
+        </div>
+        <div class="pin pin-02">
+          <div class="pin-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+          <div class="pin-title">Hyperfocus Planner</div>
+          <div class="pin-sub">Plans around your crash cycle</div>
+        </div>
+        <div class="pin pin-03">
+          <div class="pin-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+          <div class="pin-title">Task Paralysis Kit</div>
+          <div class="pin-sub">5-minute unstuck moves</div>
+        </div>
+        <div class="pin-note">nobody has ever finished a planner. this one doesn't mind.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="wrap">
+      <h2>You've bought four planners this year. All four are somewhere under your bed.</h2>
+      <p class="lead">That's not a discipline problem. Most productivity tools are built for brains that finish what they start on the first try. Unhingedly is built for the rest of us.</p>
+      <div class="sticky-row">
+        <div class="sticky">47 tabs open, 2 of them are the same tab</div>
+        <div class="sticky">the to-do list you rewrote at 11:40pm</div>
+        <div class="sticky">task paralysis at a sink with 3 dishes in it</div>
+        <div class="sticky">hyperfocused until 3am on the wrong project</div>
+        <div class="sticky">the habit tracker you kept for exactly 2 days</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section class="shop" id="shop">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The shop</h2>
+        <div class="filters" id="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Planner">Planners</button>
+          <button class="filter-btn" data-filter="Template">Templates</button>
+          <button class="filter-btn" data-filter="Guide">Guides</button>
+          <button class="filter-btn" data-filter="Bundle">Bundles</button>
+        </div>
+      </div>
+
+      <div class="shop-grid" id="shopGrid">
+
+        <article class="product" data-category="Template" data-name="The Brain Dump System" data-price="12" data-price-id="price_REPLACE_BRAINDUMP">
+          <div class="cover c1">
+            <div class="pin-tape"></div>
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/></svg></div>
+            <div class="cover-title">The Brain Dump System</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Template</span>
+              <span class="product-price">$12</span>
+            </div>
+            <p class="product-desc">Get every racing thought out of your head and into one place that doesn't judge you for having 30 of them at once.</p>
+            <div class="product-foot">
+              <span class="tag">Notion + PDF</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="Template" data-name="Dopamine Menu Deck" data-price="9" data-price-id="price_REPLACE_DOPAMINE">
+          <div class="cover c2">
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div>
+            <div class="cover-title">Dopamine Menu Deck</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Template</span>
+              <span class="product-price">$9</span>
+            </div>
+            <p class="product-desc">80 tasks sorted by how much energy you actually have right now, not how much you're supposed to have.</p>
+            <div class="product-foot">
+              <span class="tag">Printable PDF</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="Template" data-name="The Un-To-Do List" data-price="7" data-price-id="price_REPLACE_UNTODO">
+          <div class="cover c3">
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><path d="M4 6.5l1.5 1.5L9 4.5"/><path d="M13 6h7"/><path d="M4 12.5l1.5 1.5L9 10.5"/><path d="M13 12h7"/><path d="M4 18.5l1.5 1.5L9 16.5"/><path d="M13 18h7"/></svg></div>
+            <div class="cover-title">The Un-To-Do List</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Template</span>
+              <span class="product-price">$7</span>
+            </div>
+            <p class="product-desc">A to-do list that adjusts to your actual day instead of guilt-tripping you through it line by line.</p>
+            <div class="product-foot">
+              <span class="tag">Notion</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="Guide" data-name="Task Paralysis First-Aid Kit" data-price="15" data-price-id="price_REPLACE_TASKPARALYSIS">
+          <div class="cover c4">
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+            <div class="cover-title">Task Paralysis First-Aid Kit</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Guide</span>
+              <span class="product-price">$15</span>
+            </div>
+            <p class="product-desc">Five-minute unstuck techniques for when the dishes have been staring at you for three days straight.</p>
+            <div class="product-foot">
+              <span class="tag">PDF + worksheets</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="Planner" data-name="Hyperfocus Planner" data-price="14" data-price-id="price_REPLACE_HYPERFOCUS">
+          <div class="cover c5">
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+            <div class="cover-title">Hyperfocus Planner</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Planner</span>
+              <span class="product-price">$14</span>
+            </div>
+            <p class="product-desc">Built for the hyperfocus-and-crash cycle — plans around your real focus pattern instead of fighting it.</p>
+            <div class="product-foot">
+              <span class="tag">Notion + Printable</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="Bundle" data-name="Executive Dysfunction Starter Pack" data-price="19" data-price-id="price_REPLACE_EXECDYSFUNCTION">
+          <div class="cover c6">
+            <div class="cover-icon"><svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5-9 5-9-5Z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></svg></div>
+            <div class="cover-title">Executive Dysfunction Starter Pack</div>
+          </div>
+          <div class="product-body">
+            <div class="product-top">
+              <span class="tag">Bundle</span>
+              <span class="product-price">$19</span>
+            </div>
+            <p class="product-desc">Morning and evening routines with exactly as many steps as your brain can hold before 9am.</p>
+            <div class="product-foot">
+              <span class="tag">4-piece bundle</span>
+              <button class="btn btn-dark btn-sm add-to-cart">Get it</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <div class="how-grid">
+        <div class="how-step">
+          <span class="how-num">1</span>
+          <h3>Pick your tools</h3>
+          <p>Grab one thing or the whole shelf. Everything's a one-time purchase — no subscriptions to forget you're paying for.</p>
+        </div>
+        <div class="how-step">
+          <span class="how-num">2</span>
+          <h3>Instant download</h3>
+          <p>Your files land in your inbox right after checkout. PDF, Notion link, or both, depending on the product.</p>
+        </div>
+        <div class="how-step">
+          <span class="how-num">3</span>
+          <h3>Make it yours</h3>
+          <p>Print it, duplicate it into your own Notion, ignore the parts that don't fit your brain. It's yours now.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" id="reviews">
+    <div class="wrap">
+      <h2>From people who've actually used these</h2>
+      <div class="reviews-grid">
+        <div class="review">
+          <p>"I've opened this every day for three weeks. That's genuinely a record for me."</p>
+          <div class="review-who">
+            <div class="avatar" style="background:var(--peri)">J</div>
+            <div><div class="review-name">Jess</div><div class="review-role">Marketing manager</div></div>
+          </div>
+        </div>
+        <div class="review">
+          <p>"First planner that didn't make me feel behind by Tuesday. It just meets me where I am."</p>
+          <div class="review-who">
+            <div class="avatar" style="background:var(--pink)">P</div>
+            <div><div class="review-name">Priya</div><div class="review-role">Freelance designer</div></div>
+          </div>
+        </div>
+        <div class="review">
+          <p>"I finished the dishes because of a five-minute card. Genuinely didn't think that would work."</p>
+          <div class="review-who">
+            <div class="avatar" style="background:var(--lime-deep)">S</div>
+            <div><div class="review-name">Sam</div><div class="review-role">Grad student</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUNDLE -->
+  <section class="bundle">
+    <div class="wrap">
+      <div class="bundle-panel">
+        <div>
+          <h2>Get the whole shelf</h2>
+          <p>All six tools, one download. For the completionists, the chronically indecisive, and anyone who'd rather buy the bundle than pick just one.</p>
+          <a href="#shop" class="btn btn-primary">See what's inside</a>
+        </div>
+        <div class="bundle-price-box" data-name="Everything Unhingedly Bundle" data-price="49" data-price-id="price_REPLACE_BUNDLE">
+          <div class="bundle-old">$76 separately</div>
+          <div class="bundle-new">$49</div>
+          <div class="bundle-save">Save $27</div>
+          <button class="btn btn-dark btn-block add-to-cart" data-bundle="true">Add the bundle</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="wrap">
+      <h2>Questions people actually ask</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What format are these in?<span class="plus"></span></summary>
+          <p>Mostly PDF and Notion. A few products include a GoodNotes-friendly version too. Each product page lists exactly what's inside before you buy.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need Notion to use these?<span class="plus"></span></summary>
+          <p>No. Anything built in Notion also comes as a printable PDF, so you can use whichever one your brain actually opens.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What if it doesn't work for my brain?<span class="plus"></span></summary>
+          <p>You get 14 days to try it and ask for a full refund, no explanation needed. Brains are different — that's the whole premise here.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is this a subscription?<span class="plus"></span></summary>
+          <p>No. Every product on this site is a one-time purchase. You keep the files forever, no recurring charge to remember to cancel.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need a diagnosis to use these?<span class="plus"></span></summary>
+          <p>Not at all. These are built with ADHD brains in mind, but they're just as useful if you're tired, overwhelmed, or new to any of this.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="news">
+    <div class="wrap">
+      <div class="news-panel">
+        <div>
+          <h2>The Chaos Club</h2>
+          <p>New tools, mildly unhinged productivity tips, and the occasional confession about our own executive dysfunction. No spam — we can barely remember to send this.</p>
+        </div>
+        <div>
+          <form class="news-form" id="newsForm">
+            <input type="email" placeholder="you@example.com" required aria-label="Email address">
+            <button type="submit" class="btn btn-primary">Join</button>
+          </form>
+          <div class="news-confirm" id="newsConfirm"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="logo-mark">Unhingedly</span>
+        <p>Digital tools for brains that do things out of order. Built by someone who has, in fact, lost the planner.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Shop</h4>
+          <a href="#shop">Planners</a>
+          <a href="#shop">Templates</a>
+          <a href="#shop">Guides</a>
+          <a href="#shop">Bundles</a>
+        </div>
+        <div class="foot-col">
+          <h4>Site</h4>
+          <a href="#how">How it works</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="foot-col">
+          <h4>Say hi</h4>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">hello@unhingedly.co</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Unhingedly. Not medical advice — just tools that get it.</span>
+      <span>Made for the four-tabs-of-the-same-tab brains.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer" aria-hidden="true">
+  <div class="cart-head">
+    <h3>Your cart</h3>
+    <button class="icon-btn" id="cartCloseBtn" aria-label="Close cart">
+      <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Nothing in here yet. Add something from the shop.</div>
+  </div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Subtotal</span><span id="cartTotal">$0</span></div>
+    <button class="btn btn-primary btn-block" id="checkoutBtn">Checkout</button>
+    <div class="cart-toast" id="cartToast"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- Mobile menu ----
+  var menuOpenBtn = document.getElementById('menuOpenBtn');
+  var menuCloseBtn = document.getElementById('menuCloseBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  menuOpenBtn.addEventListener('click', function(){ mobileMenu.classList.add('open'); });
+  menuCloseBtn.addEventListener('click', function(){ mobileMenu.classList.remove('open'); });
+  mobileMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mobileMenu.classList.remove('open'); });
+  });
+
+  // ---- Shop filters ----
+  var filterBtns = document.querySelectorAll('.filter-btn');
+  var products = document.querySelectorAll('.product');
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var f = btn.getAttribute('data-filter');
+      products.forEach(function(p){
+        var show = (f === 'all') || (p.getAttribute('data-category') === f);
+        p.style.display = show ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- Cart ----
+  var cart = [];
+  var cartOverlay = document.getElementById('cartOverlay');
+  var cartDrawer = document.getElementById('cartDrawer');
+  var cartItemsEl = document.getElementById('cartItems');
+  var cartTotalEl = document.getElementById('cartTotal');
+  var cartCountEl = document.getElementById('cartCount');
+  var cartToast = document.getElementById('cartToast');
+
+  function openCart(){
+    cartDrawer.classList.add('open');
+    cartOverlay.classList.add('open');
+    cartDrawer.setAttribute('aria-hidden', 'false');
+  }
+  function closeCart(){
+    cartDrawer.classList.remove('open');
+    cartOverlay.classList.remove('open');
+    cartDrawer.setAttribute('aria-hidden', 'true');
+  }
+  document.getElementById('cartOpenBtn').addEventListener('click', openCart);
+  document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
+  cartOverlay.addEventListener('click', closeCart);
+
+  function renderCart(){
+    if(cart.length === 0){
+      cartItemsEl.innerHTML = '<div class="cart-empty">Nothing in here yet. Add something from the shop.</div>';
+    } else {
+      cartItemsEl.innerHTML = cart.map(function(item, i){
+        return '<div class="cart-item">' +
+          '<div class="cart-item-swatch" style="background:' + item.color + '"></div>' +
+          '<div style="flex:1">' +
+            '<div class="cart-item-name">' + item.name + '</div>' +
+            '<div class="cart-item-price">$' + item.price + '</div>' +
+            '<button class="cart-item-remove" data-index="' + i + '">Remove</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    var total = cart.reduce(function(sum, item){ return sum + item.price; }, 0);
+    cartTotalEl.textContent = '$' + total;
+    if(cart.length > 0){
+      cartCountEl.hidden = false;
+      cartCountEl.textContent = cart.length;
+    } else {
+      cartCountEl.hidden = true;
+    }
+    cartItemsEl.querySelectorAll('.cart-item-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        cart.splice(parseInt(btn.getAttribute('data-index'), 10), 1);
+        renderCart();
+      });
+    });
+  }
+
+  var swatches = ['var(--peri)','var(--pink)','#2E2A22','var(--lime-deep)','#E38A2E','var(--ink)'];
+  document.querySelectorAll('.add-to-cart').forEach(function(btn, idx){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('[data-name]') || btn.closest('.bundle-price-box');
+      var name = card.getAttribute('data-name') || 'Everything Unhingedly Bundle';
+      var price = parseInt(card.getAttribute('data-price') || '49', 10);
+      var priceId = card.getAttribute('data-price-id') || '';
+      cart.push({ name: name, price: price, color: swatches[idx % swatches.length], priceId: priceId });
+      renderCart();
+      openCart();
+      cartToast.textContent = '';
+    });
+  });
+
+  var checkoutBtn = document.getElementById('checkoutBtn');
+  checkoutBtn.addEventListener('click', function(){
+    if(cart.length === 0){
+      cartToast.textContent = "your cart is as empty as my inbox at 0 unread";
+      return;
+    }
+
+    var originalLabel = checkoutBtn.textContent;
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'Redirecting…';
+    cartToast.textContent = '';
+
+    fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cart.map(function(item){ return { price: item.priceId, quantity: 1 }; })
+      })
+    })
+    .then(function(res){
+      return res.json().then(function(data){ return { ok: res.ok, data: data }; });
+    })
+    .then(function(result){
+      if(result.ok && result.data.url){
+        window.location.href = result.data.url;
+        return;
+      }
+      cartToast.textContent = (result.data && result.data.error) || "checkout isn't wired up yet";
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = originalLabel;
+    })
+    .catch(function(){
+      cartToast.textContent = "couldn't reach checkout — is the Stripe function deployed?";
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = originalLabel;
+    });
+  });
+
+  // ---- Post-checkout banner (Stripe redirects back with ?checkout=success/cancel) ----
+  var urlParams = new URLSearchParams(window.location.search);
+  var checkoutStatus = urlParams.get('checkout');
+  var orderBanner = document.getElementById('orderBanner');
+  var orderBannerText = document.getElementById('orderBannerText');
+  if(checkoutStatus === 'success'){
+    cart = [];
+    renderCart();
+    orderBannerText.textContent = "Payment received — check your email for your downloads.";
+    orderBanner.classList.add('show', 'success');
+  } else if(checkoutStatus === 'cancel'){
+    orderBannerText.textContent = "Checkout canceled — your cart is still here whenever you're ready.";
+    orderBanner.classList.add('show', 'cancel');
+  }
+  document.getElementById('orderBannerClose').addEventListener('click', function(){
+    orderBanner.classList.remove('show');
+  });
+  if(checkoutStatus){
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  // ---- Newsletter ----
+  document.getElementById('newsForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('newsConfirm').textContent = "you're in. we'll try to remember to email you.";
+    e.target.reset();
+  });
+
+  // ---- Nav shadow on scroll ----
+  var nav = document.querySelector('.nav');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 8){ nav.style.boxShadow = '0 4px 14px -10px rgba(28,23,16,0.4)'; }
+    else{ nav.style.boxShadow = 'none'; }
+  });
+})();
+</script>
+
+</body>
+</html>
